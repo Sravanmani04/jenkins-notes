@@ -1,0 +1,177 @@
+Jenkins Download
+================
+
+Dependency: java-17
+sudo wget -O /usr/share/keyrings/jenkins-keyring.asc https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc]" https://pkg.jenkins.io/debian-stable binary/ | sudo tee /etc/apt/sources.list.d/jenkins.list > /dev/null
+sudo apt-get update
+sudo apt-get install fontconfig openjdk-17-jre
+sudo apt-get install jenkins
+
+Jenkins Pipeline
+================
+(series of tasks done in order on different servers)
+* Pipeline as Code - declarative
+* DSL - Groovy scripts
+  1. scripted pipeline
+  2. declarative pipeline
+
+Advantages:
+- collection of multiple freestyle jobs into 1 single pipeline job
+- reuse the code
+- single job can connect to multiple servers
+- ability to call another job within a pipeline
+
+Declarative Syntax:
+-------
+pipeline {
+  stages {
+    stage("stage1"){
+      agent { }
+      steps { }
+    }
+    stage("stage2"){
+      agent { }
+      steps { }
+    }
+  }
+}
+
+Scripted syntax:
+================
+Example-1
+==========
+
+node {
+    stage('stage-1') {
+        sh 'echo Hello World'
+    }
+}
+
+Example-2
+=========
+node {
+    stage('Test') {
+        git 'https://github.com/user/project.git'
+        sh 'mvn test'
+        archiveArtifacts artifacts: 'target/surefire-reports/**'
+    }
+    stage('Build') {
+        sh 'mvn clean package -DskipTests' 
+        archiveArtifacts artifacts: 'target/*.jar'
+    }
+    stage('Deploy') {
+        sh 'echo Deploy'
+    }
+}
+=============================================================
+Note: Shared library representation @Library('name of the library specified under Jenkins library') _
+======================================================================================================
+
+@Library('jenkins-shared-library') _
+
+pipeline {
+    agent any
+    stages {
+        stage('Hello') {
+            steps {
+                name('sravan')
+            }
+        }
+    }
+}
+
+=====================================
+
+@Library('jenkins-shared-library') _
+
+pipeline {
+    agent any
+    stages {
+        stage('Hello') {
+            steps {
+                name('sravan')
+		name('hari')
+            }
+        }
+    }
+}
+=======================================
+Note: In declarative pipeline we should not use groovy syntax directly, we should put them under script block to Execute.
+=======================================
+@Library('jenkins-shared-library') _
+
+pipeline {
+    agent any
+    stages {
+        stage('Hello') {
+            steps {
+               script{
+                   calculator.add(10,10)
+               }
+            }
+        }
+    }
+}
+=============================================
+@Library('jenkins-shared-library') _
+
+pipeline {
+    agent any
+    stages {
+        stage('Hello') {
+            steps {
+               script{
+                   calculator.add(10,10)
+		   calculator.mul(10,10)
+               }
+            }
+        }
+    }
+}
+=============================================
+@Library('jenkins-shared-library') _
+
+pipeline {
+    agent any
+    stages {
+        stage('Hello') {
+            steps {
+               script{
+                   calculator.add(10,10)
+                   calculator.mul(10,10)
+                   print.print(10,20)
+               }
+            }
+        }
+    }
+}
+=============================================
+@Library('jenkins-shared-library') _
+
+pipeline {
+    agent any
+    stages {
+        stage('Hello') {
+            steps {
+               script{
+                   calculator.add(10,10)
+                   calculator.mul(10,10)
+                   print.print(10,20)
+                   print.printb(30,20)
+                   print.printq(10,30)
+               }
+            }
+        }
+    }
+}
+=====================================================
+Variables in groovy:
+How to?
+	Define Variables
+	Name Variables
+		* You can only use letters digits and _
+		* Groovy is case sensitive
+		* Groovy is dynamically typed
+Multiple Assignments
+
